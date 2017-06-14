@@ -1,0 +1,67 @@
+package com.neuroandroid.pybase.base;
+
+
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.neuroandroid.pybase.config.Constant;
+import com.neuroandroid.pybase.exception.APIException;
+import com.neuroandroid.pybase.utils.L;
+
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import retrofit2.HttpException;
+
+/**
+ * Created by NeuroAndroid on 2017/6/12.
+ */
+
+public abstract class BaseObserver<T> implements Observer<BaseResponse<T>> {
+    @Override
+    public void onSubscribe(Disposable d) {
+
+    }
+
+    @Override
+    public void onNext(@NonNull BaseResponse<T> response) {
+        if (response.getCode() == Constant.RESPONSE_CODE_OK) {
+            T data = response.getData();
+            onHandleSuccess(data);
+        } else {
+            onHandleError(response.getMsg());
+        }
+    }
+
+    @Override
+    public void onError(Throwable e) {
+        L.e("error:" + e.toString());
+        if (e instanceof APIException) {
+            APIException exception = (APIException) e;
+            onHandleError(exception.getMessage());
+        } else if (e instanceof UnknownHostException) {
+            onHandleError("请打开网络");
+        } else if (e instanceof SocketTimeoutException) {
+            onHandleError("请求超时");
+        } else if (e instanceof ConnectException) {
+            onHandleError("连接失败");
+        } else if (e instanceof HttpException) {
+            onHandleError("请求超时");
+        } else {
+            onHandleError("请求失败");
+        }
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {
+        Log.e("main", "onComplete");
+    }
+
+    protected abstract void onHandleSuccess(T t);
+
+    protected abstract void onHandleError(String tip);
+}

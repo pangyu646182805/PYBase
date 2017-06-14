@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">PYBase</string>
+
+    <string name="state_error">数据加载失败</string>
+    <string name="state_reload">重新加载</string>
+</resources>
