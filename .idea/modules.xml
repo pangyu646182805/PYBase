@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PYBase.iml" filepath="$PROJECT_DIR$/PYBase.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pybase/pybase.iml" filepath="$PROJECT_DIR$/pybase/pybase.iml" />
     </modules>
   </component>
 </project>
