@@ -255,3 +255,65 @@ public void showLoginMsg(User user) {
 * 支持item的单击和长按监听
 * 支持RecyclerView多ViewType
 
+使用方法：
+```
+class  PYAdapter extends BaseRvAdapter<String> {
+    public PYAdapter(Context context, List<String> dataList, int layoutId) {
+        super(context, dataList, layoutId);
+    }
+
+    @Override
+    public void convert(BaseViewHolder holder, String item, int position, int viewType) {
+        holder.setText(R.id.tv, item);
+    }
+}
+```
+```
+rc.setAdapter(new PYAdapter(this, dataList, R.layout.item));
+```
+多布局使用方法：
+```
+class PYAdapter extends BaseRvAdapter<String> {
+    public PYAdapter(Context context, List<String> dataList, IMultiItemViewType<String> multiItemViewType) {
+        super(context, dataList, multiItemViewType);
+    }
+
+    @Override
+    public void convert(BaseViewHolder holder, String item, int position, int viewType) {
+        switch (viewType) {
+            case 100:
+                holder.setText(R.id.tv, item + " 100");
+                break;
+            case 200:
+                holder.setText(R.id.tv, item + " 200");
+                break;
+        }
+    }
+}
+```
+```
+PYAdapter pyAdapter = new PYAdapter(this, dataList, new IMultiItemViewType<String>() {
+  @Override
+  public int getViewTypeCount() {
+      return 2;
+  }
+
+  @Override
+  public int getItemViewType(int position, String s) {
+      if (position % 2 == 0) {
+          return 100;
+      } else {
+          return 200;
+      }
+  }
+
+  @Override
+  public int getLayoutId(int viewType) {
+      return R.layout.item;
+  }
+});
+rv.setAdapter(pyAdapter);
+```
+
+
+
