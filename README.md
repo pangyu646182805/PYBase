@@ -314,6 +314,15 @@ PYAdapter pyAdapter = new PYAdapter(this, dataList, new IMultiItemViewType<Strin
 });
 rv.setAdapter(pyAdapter);
 ```
+添加Header/Footer(支持多Header/Footer)：
+```
+View headerView0 = LayoutInflater.from(this).inflate(R.layout.item, null);
+View headerView1 = LayoutInflater.from(this).inflate(R.layout.item, null);
+View footerView0 = LayoutInflater.from(this).inflate(R.layout.item, null);
+View footerView1 = LayoutInflater.from(this).inflate(R.layout.item, null);
 
+pyAdapter.addHeaderView(headerView0, headerView1);
+pyAdapter.addFooterView(footerView0, footerView1);
+```
 
 
