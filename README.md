@@ -48,3 +48,79 @@ private static OkHttpClient getClient() {
     return builder.build();
 }
 ```
+
+接下来就是MVP的使用：
+首先是一些基类：
+IView：
+```
+public interface IView<T extends IPresenter> {
+    /**
+     * 设置presenter
+     * @param presenter
+     */
+    void setPresenter(T presenter);
+
+    /**
+     * 显示加载动画
+     */
+    void showLoading();
+
+    /**
+     * 隐藏加载
+     */
+    void hideLoading();
+
+    /**
+     * 显示错误状态
+     */
+    void showError(StateLayout.OnRetryListener onRetryListener);
+
+    /**
+     * 显示提示
+     */
+    void showTip(String tip);
+}
+```
+BasePresenter：
+```
+public class BasePresenter<M extends IModel, V extends IView> implements IPresenter {
+    protected CompositeDisposable mCompositeDisposable;
+
+    protected M mModel;
+    protected V mView;
+
+    public BasePresenter(String baseUrl, V view) {
+        this.mView = view;
+    }
+
+    protected void addDispose(Disposable disposable) {
+        if (mCompositeDisposable == null) {
+            mCompositeDisposable = new CompositeDisposable();
+        }
+        // 将所有disposable放入，集中处理
+        mCompositeDisposable.add(disposable);
+    }
+
+    @Override
+    public void onDestroy() {
+        unDispose();
+        if (mModel != null)
+            mModel.onDestroy();
+        this.mModel = null;
+        this.mView = null;
+        this.mCompositeDisposable = null;
+    }
+
+    /**
+     * 解除订阅
+     */
+    protected void unDispose() {
+        if (mCompositeDisposable != null) {
+            // 保证activity结束时取消所有正在执行的订阅
+            mCompositeDisposable.clear();
+        }
+    }
+}
+```
+
+
