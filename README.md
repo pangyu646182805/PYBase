@@ -254,6 +254,7 @@ public void showLoginMsg(User user) {
 * 支持添加多个Header和Footer
 * 支持item的单击和长按监听
 * 支持RecyclerView多ViewType
+* RecyclerView数据源变动的封装
 
 使用方法：
 ```
@@ -324,5 +325,34 @@ View footerView1 = LayoutInflater.from(this).inflate(R.layout.item, null);
 pyAdapter.addHeaderView(headerView0, headerView1);
 pyAdapter.addFooterView(footerView0, footerView1);
 ```
+RecyclerView item单击和长按监听：
+```
+pyAdapter.setOnItemClickListener((holder, position, item) -> {});
+pyAdapter.setOnItemLongClickListener((holder, position, item) -> {});
+```
+RecyclerView数据源变动的封装：
+```
+void add(T item);
 
+void add(int position, T item);
 
+void addAll(List<T> items);
+
+void addAll(int position, List<T> items);
+
+void remove(T item);
+
+void remove(int position);
+
+void removeAll(List<T> items);
+
+void retainAll(List<T> items);
+
+void set(T oldItem, T newItem);
+
+void set(int position, T item);
+
+void replaceAll(List<T> items);
+
+void clear();
+```
