@@ -11,6 +11,7 @@ import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.neuroandroid.pybase.R;
 import com.neuroandroid.pybase.adapter.base.BaseRvAdapter;
 import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
+import com.neuroandroid.pybase.adapter.base.IMultiItemViewType;
 import com.neuroandroid.pybase.base.BaseActivity;
 import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
@@ -54,7 +55,26 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
         for (int i = 0; i < 60; i++) {
             dataList.add(i + "");
         }
-        MyAdapter myAdapter = new MyAdapter(this, dataList, R.layout.item);
+        MyAdapter myAdapter = new MyAdapter(this, dataList, new IMultiItemViewType<String>() {
+            @Override
+            public int getViewTypeCount() {
+                return 2;
+            }
+
+            @Override
+            public int getItemViewType(int position, String s) {
+                if (position % 2 == 0) {
+                    return 100;
+                } else {
+                    return 200;
+                }
+            }
+
+            @Override
+            public int getLayoutId(int viewType) {
+                return R.layout.item;
+            }
+        });
         mRv.setAdapter(myAdapter);
 
         View headerView = LayoutInflater.from(this).inflate(R.layout.item, null);
@@ -92,13 +112,20 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
     }
 
     class MyAdapter extends BaseRvAdapter<String> {
-        public MyAdapter(Context context, List<String> dataList, int layoutId) {
-            super(context, dataList, layoutId);
+        public MyAdapter(Context context, List<String> dataList, IMultiItemViewType<String> multiItemViewType) {
+            super(context, dataList, multiItemViewType);
         }
 
         @Override
-        public void convert(BaseViewHolder holder, String item, int position) {
-            holder.setText(R.id.tv, item);
+        public void convert(BaseViewHolder holder, String item, int position, int viewType) {
+            switch (viewType) {
+                case 100:
+                    holder.setText(R.id.tv, item + " 100");
+                    break;
+                case 200:
+                    holder.setText(R.id.tv, item + " 200");
+                    break;
+            }
         }
     }
 }

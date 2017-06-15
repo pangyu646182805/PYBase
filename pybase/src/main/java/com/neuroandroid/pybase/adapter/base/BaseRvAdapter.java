@@ -36,11 +36,19 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
     protected int mEmptyViewId;
     // EmptyView的位置
     protected int mEmptyViewPosition = -1;
+    protected IMultiItemViewType<T> mMultiItemViewType;
 
     public BaseRvAdapter(Context context, List<T> dataList, int layoutId) {
         mContext = context;
         mDataList = dataList == null ? new ArrayList<>() : dataList;
         mLayoutId = layoutId;
+        this.mMultiItemViewType = null;
+    }
+
+    public BaseRvAdapter(Context context, List<T> dataList, IMultiItemViewType<T> multiItemViewType) {
+        mContext = context;
+        mDataList = dataList == null ? new ArrayList<>() : dataList;
+        this.mMultiItemViewType = multiItemViewType == null ? null : multiItemViewType;
     }
 
     /**
@@ -64,7 +72,13 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         } else if (viewType >= BaseViewType.HEADER && mHeaderViews != null && mHeaderViews.get(viewType) != null) {
             return BaseViewHolder.createViewHolder(mContext, mHeaderViews.get(viewType));
         } else {
-            BaseViewHolder viewHolder = BaseViewHolder.createViewHolder(mContext, parent, mLayoutId);
+            int layoutId;
+            if (mMultiItemViewType != null) {
+                layoutId = mMultiItemViewType.getLayoutId(viewType);
+            } else {
+                layoutId = mLayoutId;
+            }
+            BaseViewHolder viewHolder = BaseViewHolder.createViewHolder(mContext, parent, layoutId);
             setListener(viewHolder);
             return viewHolder;
         }
@@ -75,7 +89,7 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         if (isInHeadViewPos(position) || isInFootViewPos(position)) {
             return;
         }
-        convert(holder, mDataList.get(position - getHeaderCounts()), position);
+        convert(holder, mDataList.get(position - getHeaderCounts()), position, getItemViewType(position));
     }
 
     /**
@@ -92,7 +106,7 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         this.mEmptyViewId = layoutId;
     }
 
-    public abstract void convert(BaseViewHolder holder, T item, int position);
+    public abstract void convert(BaseViewHolder holder, T item, int position, int viewType);
 
     @Override
     public int getItemViewType(int position) {
@@ -101,7 +115,12 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         } else if (isInFootViewPos(position)) {
             return mFooterViews.keyAt(position - getDataListSize() - getHeaderCounts());
         } else {
-            return super.getItemViewType(position);
+            if (mMultiItemViewType != null) {
+                int newPosition = position - getHeaderCounts();
+                return mMultiItemViewType.getItemViewType(newPosition, mDataList.get(newPosition));
+            } else {
+                return super.getItemViewType(position);
+            }
         }
     }
 
