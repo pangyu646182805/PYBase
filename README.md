@@ -296,11 +296,6 @@ class PYAdapter extends BaseRvAdapter<String> {
 ```
 PYAdapter pyAdapter = new PYAdapter(this, dataList, new IMultiItemViewType<String>() {
   @Override
-  public int getViewTypeCount() {
-      return 2;
-  }
-
-  @Override
   public int getItemViewType(int position, String s) {
       if (position % 2 == 0) {
           return 100;
