@@ -255,6 +255,7 @@ public void showLoginMsg(User user) {
 * 支持item的单击和长按监听
 * 支持RecyclerView多ViewType
 * RecyclerView数据源变动的封装
+* RecyclerView列表的单选和多选模式
 
 使用方法：
 ```
@@ -356,3 +357,76 @@ void replaceAll(List<T> items);
 
 void clear();
 ```
+RecyclerView列表的单选和多选模式：
+
+使用SelectAdapter(继承自BaseRvAdapter)
+```
+// 单选模式
+selectAdapter.setSelectedMode(ISelect.SINGLE_MODE);
+// 多选模式
+selectAdapter.setSelectedMode(ISelect.MULTIPLE_MODE);
+```
+创建实体类实现ISelect接口：
+```
+public class TestSelectBean implements ISelect {
+    private boolean isSelected;
+    private String text;
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+}
+```
+创建SelectAdapter：
+```
+class PyAdapter extends SelectAdapter<TestSelectBean> {
+    public PyAdapter(Context context, List<TestSelectBean> dataList, int layoutId) {
+        super(context, dataList, layoutId);
+    }
+
+    @Override
+    public void convert(BaseViewHolder holder, TestSelectBean item, int position, int viewType) {
+        CheckBox cb = holder.getView(R.id.cb);
+        cb.setChecked(item.isSelected());
+        holder.setText(R.id.tv, item.getText());
+    }
+}
+```
+设置选择模式下的监听：
+```
+mAdapter.setItemSelectedListener(new SelectAdapter.OnItemSelectedListener<TestSelectBean>() {
+    @Override
+    public void onItemSelected(BaseViewHolder viewHolder, int position, boolean isSelected, TestSelectBean testSelectBean) {
+      if (isSelected) {
+        // 如果被选中
+      } else {
+        // 如果没有被选中
+      }
+    }
+
+    @Override
+    public void onNothingSelected() {
+      // 什么也没有选中
+    }
+});
+```
+
+
+
+
+
+
