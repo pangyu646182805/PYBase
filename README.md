@@ -50,8 +50,8 @@ private static OkHttpClient getClient() {
 ```
 
 接下来就是MVP的使用：
-首先是一些基类：
-IView：
+* 首先是一些基类：
+* IView：
 ```
 public interface IView<T extends IPresenter> {
     /**
