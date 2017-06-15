@@ -124,5 +124,128 @@ public class BasePresenter<M extends IModel, V extends IView> implements IPresen
     }
 }
 ```
+BaseModel获取RetrofitService实例：
+```
+public class BaseModel implements IModel {
+    protected ApiService mService;
 
+    public BaseModel(String baseUrl) {
+        mService = RetrofitUtils.getInstance(baseUrl).create(ApiService.class);
+    }
+
+    @Override
+    public void onDestroy() {
+        mService = null;
+    }
+
+```
+ILoginContract：
+```
+public interface ILoginContract {
+    interface Presenter extends IPresenter {
+        /**
+         * 登录
+         */
+        void login(String param, String password, int userType, String ip);
+    }
+
+    interface View extends IView<Presenter> {
+        /**
+         * 获取登录信息
+         * @param user
+         */
+        void showLoginMsg(User user);
+    }
+}
+```
+LoginModelImpl省略...
+LoginPresenter：
+```
+public class LoginPresenter extends BasePresenter<LoginModelImpl, ILoginContract.View> implements ILoginContract.Presenter {
+    public LoginPresenter(String baseUrl, ILoginContract.View view) {
+        super(baseUrl, view);
+        mModel = new LoginModelImpl(Constant.BASE_URL);
+        mView.setPresenter(this);
+    }
+
+    @Override
+    public void login(String param, String password, int userType, String ip) {
+        ModelFilteredFactory.compose(mModel.login(param, password, userType, ip))
+                .compose(RxUtils.bindToLifecycle(mView))
+                .subscribe(new BaseObserver<User>() {
+                    @Override
+                    protected void onHandleSuccess(User user) {
+                        mView.showLoginMsg(user);
+                    }
+
+                    @Override
+                    protected void onHandleError(String tip) {
+                        mView.showTip(tip);
+                    }
+                });
+    }
+}
+```
+其中使用了RxLifecycle绑定了activity和fragment的生命周期，防止rxjava使用过程当中的内存泄漏(生命周期的解除订阅)
+```
+public static <T> LifecycleTransformer<T> bindToLifecycle(IView view) {
+    if (view instanceof RxAppCompatActivity) {
+        return ((RxAppCompatActivity) view).bindToLifecycle();
+    } else if (view instanceof RxFragment) {
+        return ((RxFragment) view).bindToLifecycle();
+    } else {
+        throw new IllegalArgumentException("view isn't activity or fragment");
+    }
+}
+```
+BaseObserver：简单封装了Observer
+```
+@Override
+public void onNext(@NonNull BaseResponse<T> response) {
+    if (response.getCode() == Constant.RESPONSE_CODE_OK) {
+        T data = response.getData();
+        onHandleSuccess(data);
+    } else {
+        onHandleError(response.getMsg());
+    }
+}
+
+@Override
+public void onError(Throwable e) {
+    L.e("error:" + e.toString());
+    if (e instanceof APIException) {
+        APIException exception = (APIException) e;
+        onHandleError(exception.getMessage());
+    } else if (e instanceof UnknownHostException) {
+        onHandleError("请打开网络");
+    } else if (e instanceof SocketTimeoutException) {
+        onHandleError("请求超时");
+    } else if (e instanceof ConnectException) {
+        onHandleError("连接失败");
+    } else if (e instanceof HttpException) {
+        onHandleError("请求超时");
+    } else {
+        onHandleError("请求失败");
+    }
+    e.printStackTrace();
+}
+```
+在activity(封装了BaseActivity简化代码)中使用：
+```
+public class MainActivity extends BaseActivity<ILoginContract.Presenter> implements ILoginContract.View
+```
+```
+mPresenter = new LoginPresenter(Constant.BASE_URL, this);
+```
+发送网络请求就仅仅只需一行代码：
+```
+mPresenter.login("用户名", "123456", 0, "");
+```
+在showLoginMsg()中返回服务器返回的信息：
+```
+@Override
+public void showLoginMsg(User user) {
+  // DO SOMETHING
+}
+```
 
