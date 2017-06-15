@@ -34,7 +34,7 @@ public static Retrofit getInstance(String url) {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(getClient())
                 .build();
-        return sRetrofit;
+  return sRetrofit;
 }
 ```
 ```
@@ -48,7 +48,6 @@ private static OkHttpClient getClient() {
     return builder.build();
 }
 ```
-
 接下来就是MVP的使用：
 
 首先是一些基类：
@@ -159,6 +158,7 @@ public interface ILoginContract {
 }
 ```
 LoginModelImpl省略...
+
 LoginPresenter：
 ```
 public class LoginPresenter extends BasePresenter<LoginModelImpl, ILoginContract.View> implements ILoginContract.Presenter {
@@ -198,7 +198,7 @@ public static <T> LifecycleTransformer<T> bindToLifecycle(IView view) {
     }
 }
 ```
-BaseObserver：简单封装了Observer
+BaseObserver(简单封装了Observer)：
 ```
 @Override
 public void onNext(@NonNull BaseResponse<T> response) {
@@ -248,4 +248,10 @@ public void showLoginMsg(User user) {
   // DO SOMETHING
 }
 ```
+
+# RecyclerView.Adapter的简单封装：
+* 极大简化了代码
+* 支持添加多个Header和Footer
+* 支持item的单击和长按监听
+* 支持RecyclerView多ViewType
 
