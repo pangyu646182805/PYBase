@@ -7,5 +7,5 @@ import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
  */
 
 public interface OnItemClickListener<T> {
-    void onItemClick(BaseViewHolder holder, int position, T t);
+    void onItemClick(BaseViewHolder holder, int position, T item);
 }

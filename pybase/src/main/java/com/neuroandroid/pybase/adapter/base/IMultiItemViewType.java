@@ -6,11 +6,6 @@ package com.neuroandroid.pybase.adapter.base;
 
 public interface IMultiItemViewType<T> {
     /**
-     * 返回viewType数量
-     */
-    int getViewTypeCount();
-
-    /**
      * 返回不同position的viewType
      */
     int getItemViewType(int position, T t);

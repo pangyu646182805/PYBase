@@ -17,7 +17,7 @@ import java.util.List;
  * Created by NeuroAndroid on 2017/6/14.
  */
 
-public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> {
+public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> implements CURD<T> {
     private Context mContext;
     // 数据源
     private List<T> mDataList;
@@ -48,7 +48,14 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
     public BaseRvAdapter(Context context, List<T> dataList, IMultiItemViewType<T> multiItemViewType) {
         mContext = context;
         mDataList = dataList == null ? new ArrayList<>() : dataList;
-        this.mMultiItemViewType = multiItemViewType == null ? null : multiItemViewType;
+        this.mMultiItemViewType = multiItemViewType == null ? provideMultiItemViewType() : multiItemViewType;
+    }
+
+    /**
+     * 如果不想要构造方法传入也可以让子类实现此方法
+     */
+    protected IMultiItemViewType<T> provideMultiItemViewType() {
+        return null;
     }
 
     /**
@@ -167,14 +174,14 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         viewHolder.getItemView().setOnClickListener(view -> {
             if (mOnItemClickListener != null) {
                 int position = viewHolder.getLayoutPosition();
-                mOnItemClickListener.onItemClick(viewHolder, position, mDataList.get(position - getHeaderCounts()));
+                mOnItemClickListener.onItemClick(viewHolder, position, getItem(position));
             }
         });
 
         viewHolder.getItemView().setOnLongClickListener(view -> {
             if (mOnItemLongClickListener != null) {
                 int position = viewHolder.getLayoutPosition();
-                mOnItemLongClickListener.onItemLongClick(viewHolder, position, mDataList.get(position - getHeaderCounts()));
+                mOnItemLongClickListener.onItemLongClick(viewHolder, position, getItem(position));
             }
             return true;
         });
@@ -254,6 +261,116 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
             return 0;
         } else {
             return getDataListSize() + getHeaderCounts() + getFooterCounts();
+        }
+    }
+
+    /**
+     * 获取数据源
+     */
+    public List<T> getDataList() {
+        return mDataList;
+    }
+
+    public T getItem(int position) {
+        position = position - getHeaderCounts();
+        if (position > getDataListSize() - 1) {
+            return null;
+        }
+        return getDataList().get(position);
+    }
+
+    @Override
+    public void add(T item) {
+        add(getHeaderCounts() + getDataListSize(), item);
+    }
+
+    @Override
+    public void add(int position, T item) {
+        if (item != null) {
+            mDataList.add(position - getHeaderCounts(), item);
+            notifyItemInserted(position);
+        }
+    }
+
+    @Override
+    public void addAll(List<T> items) {
+        addAll(getHeaderCounts() + getDataListSize(), items);
+    }
+
+    @Override
+    public void addAll(int position, List<T> items) {
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+        if (position < 0 || position > getHeaderCounts() + getDataListSize()) {
+            return;
+        }
+        mDataList.addAll(position - getHeaderCounts(), items);
+        notifyItemRangeInserted(position - getHeaderCounts(), items.size());
+    }
+
+    @Override
+    public void remove(T item) {
+        int position = mDataList.indexOf(item);
+        if (mDataList.remove(item)) {
+            position = position + getHeaderCounts();
+            notifyItemRemoved(position);
+        }
+    }
+
+    @Override
+    public void remove(int position) {
+        mDataList.remove(position - getHeaderCounts());
+        notifyItemRemoved(position);
+    }
+
+    @Override
+    public void removeAll(List<T> items) {
+        mDataList.removeAll(items);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void retainAll(List<T> items) {
+        mDataList.retainAll(items);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void set(T oldItem, T newItem) {
+        int index = mDataList.indexOf(oldItem);
+        if (index != -1) {
+            set(index + getHeaderCounts(), newItem);
+        }
+    }
+
+    @Override
+    public void set(int position, T item) {
+        mDataList.set(position - getHeaderCounts(), item);
+        notifyItemChanged(position);
+    }
+
+    @Override
+    public void replaceAll(List<T> items) {
+        if (mDataList == items) {
+            notifyDataSetChanged();
+            return;
+        }
+        if (items == null || items.isEmpty()) {
+            clear();
+            return;
+        }
+        mDataList.clear();
+        mDataList.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void clear() {
+        int size = getDataListSize();
+        if (size > 0) {
+            mDataList.clear();
+            notifyItemRangeRemoved(getHeaderCounts(), size);
         }
     }
 }

@@ -7,5 +7,5 @@ import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
  */
 
 public interface OnItemLongClickListener<T> {
-    void onItemLongClick(BaseViewHolder holder, int position, T t);
+    void onItemLongClick(BaseViewHolder holder, int position, T item);
 }

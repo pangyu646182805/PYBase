@@ -17,6 +17,14 @@ public class BasePresenter<M extends IModel, V extends IView> implements IPresen
         this.mView = view;
     }
 
+    protected void addDispose(Disposable disposable) {
+        if (mCompositeDisposable == null) {
+            mCompositeDisposable = new CompositeDisposable();
+        }
+        // 将所有disposable放入，集中处理
+        mCompositeDisposable.add(disposable);
+    }
+
     @Override
     public void onDestroy() {
         unDispose();
@@ -25,13 +33,6 @@ public class BasePresenter<M extends IModel, V extends IView> implements IPresen
         this.mModel = null;
         this.mView = null;
         this.mCompositeDisposable = null;
-    }
-
-    protected void addDispose(Disposable disposable) {
-        if (mCompositeDisposable == null) {
-            mCompositeDisposable = new CompositeDisposable();
-        }
-        mCompositeDisposable.add(disposable);//将所有disposable放入,集中处理
     }
 
     /**

@@ -5,14 +5,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 
 import com.google.gson.Gson;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 import com.neuroandroid.pybase.R;
-import com.neuroandroid.pybase.adapter.base.BaseRvAdapter;
 import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
-import com.neuroandroid.pybase.adapter.base.IMultiItemViewType;
+import com.neuroandroid.pybase.adapter.base.ISelect;
+import com.neuroandroid.pybase.adapter.base.SelectAdapter;
 import com.neuroandroid.pybase.base.BaseActivity;
+import com.neuroandroid.pybase.bean.TestSelectBean;
 import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
 import com.neuroandroid.pybase.mvp.contract.ILoginContract;
@@ -30,6 +32,7 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
     TwinklingRefreshLayout mRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView mRv;
+    private MyAdapter mAdapter;
 
     @Override
     protected void initPresenter() {
@@ -51,55 +54,55 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
     @Override
     protected void initData() {
         // mPresenter.login("18805864649", "123456", 0, "");
-        List<String> dataList = new ArrayList<>();
+        List<TestSelectBean> dataList = new ArrayList<>();
+        TestSelectBean testSelectBean;
         for (int i = 0; i < 60; i++) {
-            dataList.add(i + "");
+            testSelectBean = new TestSelectBean();
+            testSelectBean.setSelected(i == 0);
+            testSelectBean.setText("position : " + i);
+            dataList.add(testSelectBean);
         }
-        MyAdapter myAdapter = new MyAdapter(this, dataList, new IMultiItemViewType<String>() {
-            @Override
-            public int getViewTypeCount() {
-                return 2;
-            }
-
-            @Override
-            public int getItemViewType(int position, String s) {
-                if (position % 2 == 0) {
-                    return 100;
-                } else {
-                    return 200;
-                }
-            }
-
-            @Override
-            public int getLayoutId(int viewType) {
-                return R.layout.item;
-            }
-        });
-        mRv.setAdapter(myAdapter);
+        mAdapter = new MyAdapter(this, dataList, R.layout.item);
+        mRv.setAdapter(mAdapter);
 
         View headerView = LayoutInflater.from(this).inflate(R.layout.item, null);
         NoPaddingTextView tvHeader = (NoPaddingTextView) headerView.findViewById(R.id.tv);
         tvHeader.setTextSize(30);
         tvHeader.setText("我是头布局");
 
-        View headerView1 = LayoutInflater.from(this).inflate(R.layout.item, null);
+        View headerView1 = LayoutInflater.from(this).inflate(R.layout.item, mRv, false);
         NoPaddingTextView tvHeader1 = (NoPaddingTextView) headerView1.findViewById(R.id.tv);
         tvHeader1.setTextSize(35);
         tvHeader1.setText("我是头布局1");
 
-        View footerView = LayoutInflater.from(this).inflate(R.layout.item, null);
+        View footerView = LayoutInflater.from(this).inflate(R.layout.item, mRv, false);
         NoPaddingTextView tvFooter = (NoPaddingTextView) footerView.findViewById(R.id.tv);
         tvFooter.setTextSize(30);
         tvFooter.setText("我是尾布局");
 
-        View footerView1 = LayoutInflater.from(this).inflate(R.layout.item, null);
+        View footerView1 = LayoutInflater.from(this).inflate(R.layout.item, mRv, false);
         NoPaddingTextView tvFooter1 = (NoPaddingTextView) footerView1.findViewById(R.id.tv);
         tvFooter1.setTextSize(30);
         tvFooter1.setText("我是尾布局1");
 
-        myAdapter.addHeaderView(headerView, headerView1);
-        myAdapter.addFooterView(footerView, footerView1);
+        mAdapter.addHeaderView(headerView, headerView1);
+        mAdapter.addFooterView(footerView, footerView1);
+
+        mAdapter.setSelectedMode(ISelect.MULTIPLE_MODE);
+        mAdapter.setItemSelectedListener(new SelectAdapter.OnItemSelectedListener<TestSelectBean>() {
+            @Override
+            public void onItemSelected(BaseViewHolder viewHolder, int position, boolean isSelected, TestSelectBean testSelectBean) {
+
+            }
+
+            @Override
+            public void onNothingSelected() {
+
+            }
+        });
     }
+
+    private List<TestSelectBean> mSelectDataList = new ArrayList<>();
 
     @Override
     public void showLoginMsg(User user) {
@@ -111,21 +114,16 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
         ((NoPaddingTextView) findViewById(R.id.tv)).setText(tip);
     }
 
-    class MyAdapter extends BaseRvAdapter<String> {
-        public MyAdapter(Context context, List<String> dataList, IMultiItemViewType<String> multiItemViewType) {
-            super(context, dataList, multiItemViewType);
+    class MyAdapter extends SelectAdapter<TestSelectBean> {
+        public MyAdapter(Context context, List<TestSelectBean> dataList, int layoutId) {
+            super(context, dataList, layoutId);
         }
 
         @Override
-        public void convert(BaseViewHolder holder, String item, int position, int viewType) {
-            switch (viewType) {
-                case 100:
-                    holder.setText(R.id.tv, item + " 100");
-                    break;
-                case 200:
-                    holder.setText(R.id.tv, item + " 200");
-                    break;
-            }
+        public void convert(BaseViewHolder holder, TestSelectBean item, int position, int viewType) {
+            CheckBox cb = holder.getView(R.id.cb);
+            cb.setChecked(item.isSelected());
+            holder.setText(R.id.tv, item.getText());
         }
     }
 }
