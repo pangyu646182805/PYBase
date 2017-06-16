@@ -419,7 +419,46 @@ mAdapter.setItemSelectedListener(new SelectAdapter.OnItemSelectedListener<TestSe
     }
 });
 ```
+# 封装BaseDialog，实现TitleDialog、ListDialog(配合SelectAdapter实现单选、多选模式)
+<img width="300" height="100" src="https://github.com/pangyu646182805/PYBase/blob/master/img/TitleDialog.png"/>
+<img width="320" height="360" src="https://github.com/pangyu646182805/PYBase/blob/master/img/ListDialog%E5%8D%95%E9%80%89.png"/><img width="320" height="360" src="https://github.com/pangyu646182805/PYBase/blob/master/img/ListDialog%E5%A4%9A%E9%80%89.png"/>
 
+使用方法：
+
+TitleDialog：
+```
+new TitleDialog(this).setDialogTitle("标题")
+        .setLeftButtonText("取消")
+        .setRightButtonText("确定")
+        .setOnLeftBtnClickListener(null)
+        .setOnRightBtnClickListener((dialog, view) -> {
+            // do something
+            dialog.dismissDialog();
+        }).showDialog();
+```
+ListDialog(默认单选模式)：
+```
+ListDialog<MyAdapter, TestSelectBean> listDialog = new ListDialog<>(this);
+listDialog.setSelectAdapter(new MyAdapter(this, dataList, R.layout.item), new SelectAdapter.OnItemSelectedListener<TestSelectBean>() {
+    @Override
+    public void onItemSelected(BaseViewHolder viewHolder, int position, boolean isSelected, TestSelectBean testSelectBean) {
+      if (isSelected) {
+        // 如果被选中
+      } else {
+        // 如果没有被选中
+      }
+    }
+
+    @Override
+    public void onNothingSelected() {
+      // 什么也没有选中
+    }
+}).setSelectMode(ISelect.SINGLE_MODE).showDialog();
+```
+多选模式：
+```
+setSelectMode(ISelect.MULTIPLE_MODE)
+```
 
 
 
