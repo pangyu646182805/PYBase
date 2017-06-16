@@ -2,7 +2,8 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/y108">
+    android:layout_height="@dimen/y108"
+    android:background="@color/backgroundPanel">
 
     <com.neuroandroid.pybase.widget.NoPaddingTextView
         android:id="@+id/tv"

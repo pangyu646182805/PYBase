@@ -1,4 +1,4 @@
-package com.neuroandroid.pybase.listener;
+package com.neuroandroid.pybase.interfaces;
 
 import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
 

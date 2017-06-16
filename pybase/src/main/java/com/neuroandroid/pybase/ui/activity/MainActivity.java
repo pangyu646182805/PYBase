@@ -19,13 +19,16 @@ import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
 import com.neuroandroid.pybase.mvp.contract.ILoginContract;
 import com.neuroandroid.pybase.mvp.presenter.LoginPresenter;
+import com.neuroandroid.pybase.utils.ShowUtils;
 import com.neuroandroid.pybase.widget.NoPaddingTextView;
+import com.neuroandroid.pybase.widget.dialog.ListDialog;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity<ILoginContract.Presenter> implements ILoginContract.View {
     @BindView(R.id.refresh_layout)
@@ -100,6 +103,31 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
 
             }
         });
+    }
+
+    @OnClick(R.id.btn)
+    public void test() {
+        List<TestSelectBean> dataList = new ArrayList<>();
+        TestSelectBean testSelectBean;
+        for (int i = 0; i < 6; i++) {
+            testSelectBean = new TestSelectBean();
+            testSelectBean.setSelected(i == 0);
+            testSelectBean.setText("position : " + i);
+            dataList.add(testSelectBean);
+        }
+
+        ListDialog<MyAdapter, TestSelectBean> listDialog = new ListDialog<>(this);
+        listDialog.setSelectAdapter(new MyAdapter(this, dataList, R.layout.item), new SelectAdapter.OnItemSelectedListener<TestSelectBean>() {
+            @Override
+            public void onItemSelected(BaseViewHolder viewHolder, int position, boolean isSelected, TestSelectBean testSelectBean) {
+                if (isSelected) ShowUtils.showToast(testSelectBean.getText());
+            }
+
+            @Override
+            public void onNothingSelected() {
+                ShowUtils.showToast("onNothingSelected");
+            }
+        }).setSelectMode(ISelect.SINGLE_MODE).showDialog();
     }
 
     private List<TestSelectBean> mSelectDataList = new ArrayList<>();

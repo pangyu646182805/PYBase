@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.neuroandroid.pybase.R;
 import com.neuroandroid.pybase.utils.SystemUtils;
@@ -32,6 +33,10 @@ public abstract class BaseActivity<P extends IPresenter> extends RxAppCompatActi
     @BindView(R.id.tool_bar)
     Toolbar mToolbar;
 
+    @Nullable
+    @BindView(R.id.status_bar)
+    View mStatusBar;
+
     protected P mPresenter;
     private Unbinder mUnBinder;
     /**
@@ -47,13 +52,16 @@ public abstract class BaseActivity<P extends IPresenter> extends RxAppCompatActi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(attachLayoutRes());
+        if (useEventBus()) EventBus.getDefault().register(this);
+        mUnBinder = ButterKnife.bind(this);
         // 沉浸式状态栏相关
         if (supportImmersive()) {
             mImmersive = SystemUtils.setTranslateStatusBar(this);
-            if (mImmersive) mStatusBarHeight = SystemUtils.getStatusHeight(this);
+            if (mImmersive) {
+                mStatusBarHeight = SystemUtils.getStatusHeight(this);
+                setStatusBar(mStatusBarHeight);
+            }
         }
-        if (useEventBus()) EventBus.getDefault().register(this);
-        mUnBinder = ButterKnife.bind(this);
         initPresenter();
         if (mToolbar != null) {
             setSupportActionBar(mToolbar);
@@ -127,6 +135,20 @@ public abstract class BaseActivity<P extends IPresenter> extends RxAppCompatActi
     @Override
     public void showTip(String tip) {
 
+    }
+
+    protected Toolbar getToolbar() {
+        return mToolbar;
+    }
+
+    /**
+     * 设置状态栏高度
+     */
+    private void setStatusBar(int statusBarHeight) {
+        if (mStatusBar != null) {
+            mStatusBar.getLayoutParams().height = statusBarHeight;
+            mStatusBar.requestLayout();
+        }
     }
 
     @Override

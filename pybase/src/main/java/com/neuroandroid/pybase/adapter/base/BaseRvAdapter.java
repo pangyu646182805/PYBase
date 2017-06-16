@@ -7,8 +7,8 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.neuroandroid.pybase.listener.OnItemClickListener;
-import com.neuroandroid.pybase.listener.OnItemLongClickListener;
+import com.neuroandroid.pybase.interfaces.OnItemClickListener;
+import com.neuroandroid.pybase.interfaces.OnItemLongClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
