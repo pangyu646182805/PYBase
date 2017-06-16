@@ -419,7 +419,7 @@ mAdapter.setItemSelectedListener(new SelectAdapter.OnItemSelectedListener<TestSe
     }
 });
 ```
-# 封装BaseDialog，实现TitleDialog、ListDialog(配合SelectAdapter实现单选、多选模式)
+# 封装BaseDialog，实现TitleDialog、BottomDialog、ListDialog(配合SelectAdapter实现单选、多选模式)
 <img width="300" height="100" src="https://github.com/pangyu646182805/PYBase/blob/master/img/TitleDialog.png"/>
 <img width="320" height="360" src="https://github.com/pangyu646182805/PYBase/blob/master/img/ListDialog%E5%8D%95%E9%80%89.png"/><img width="320" height="360" src="https://github.com/pangyu646182805/PYBase/blob/master/img/ListDialog%E5%A4%9A%E9%80%89.png"/>
 <img width="388" height="615" src="https://github.com/pangyu646182805/PYBase/blob/master/img/BottomDialog.png"/>
