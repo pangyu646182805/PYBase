@@ -19,9 +19,8 @@ import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
 import com.neuroandroid.pybase.mvp.contract.ILoginContract;
 import com.neuroandroid.pybase.mvp.presenter.LoginPresenter;
-import com.neuroandroid.pybase.utils.ShowUtils;
 import com.neuroandroid.pybase.widget.NoPaddingTextView;
-import com.neuroandroid.pybase.widget.dialog.ListDialog;
+import com.neuroandroid.pybase.widget.dialog.BottomDialog;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
@@ -107,7 +106,16 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
 
     @OnClick(R.id.btn)
     public void test() {
-        List<TestSelectBean> dataList = new ArrayList<>();
+        /*new TitleDialog(this).setDialogTitle("标题")
+                .setLeftButtonText("取消")
+                .setRightButtonText("确定")
+                .setOnLeftBtnClickListener(null)
+                .setOnRightBtnClickListener((dialog, view) -> {
+                    // do something
+                    dialog.dismissDialog();
+                }).showDialog();*/
+
+        /*List<TestSelectBean> dataList = new ArrayList<>();
         TestSelectBean testSelectBean;
         for (int i = 0; i < 6; i++) {
             testSelectBean = new TestSelectBean();
@@ -127,7 +135,16 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
             public void onNothingSelected() {
                 ShowUtils.showToast("onNothingSelected");
             }
-        }).setSelectMode(ISelect.SINGLE_MODE).showDialog();
+        }).setSelectMode(ISelect.MULTIPLE_MODE).showDialog();*/
+
+        new BottomDialog(this)
+                .setFullWidth()
+                .setFromBottom()
+                .setLeftButtonText("拍照")
+                .setRightButtonText("从相册中选择照片")
+                .setOnLeftBtnClickListener((dialog, view) -> {})
+                .setOnRightBtnClickListener((dialog, view) -> {})
+                .showDialog();
     }
 
     private List<TestSelectBean> mSelectDataList = new ArrayList<>();
