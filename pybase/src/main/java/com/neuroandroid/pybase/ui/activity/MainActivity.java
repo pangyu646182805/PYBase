@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 
 import com.google.gson.Gson;
 import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
+import com.lcodecore.tkrefreshlayout.header.progresslayout.ProgressLayout;
 import com.neuroandroid.pybase.R;
 import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
 import com.neuroandroid.pybase.adapter.base.ISelect;
@@ -19,8 +20,8 @@ import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
 import com.neuroandroid.pybase.mvp.contract.ILoginContract;
 import com.neuroandroid.pybase.mvp.presenter.LoginPresenter;
+import com.neuroandroid.pybase.utils.L;
 import com.neuroandroid.pybase.widget.NoPaddingTextView;
-import com.neuroandroid.pybase.widget.dialog.BottomDialog;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
@@ -50,12 +51,11 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
     protected void initView() {
         mRv.setLayoutManager(new LinearLayoutManager(this));
         mRv.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
-        mRefreshLayout.setPureScrollModeOn();
+        mRefreshLayout.setHeaderView(new ProgressLayout(this));
     }
 
     @Override
     protected void initData() {
-        // mPresenter.login("18805864649", "123456", 0, "");
         List<TestSelectBean> dataList = new ArrayList<>();
         TestSelectBean testSelectBean;
         for (int i = 0; i < 60; i++) {
@@ -106,57 +106,23 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
 
     @OnClick(R.id.btn)
     public void test() {
-        /*new TitleDialog(this).setDialogTitle("标题")
-                .setLeftButtonText("取消")
-                .setRightButtonText("确定")
-                .setOnLeftBtnClickListener(null)
-                .setOnRightBtnClickListener((dialog, view) -> {
-                    // do something
-                    dialog.dismissDialog();
-                }).showDialog();*/
-
-        /*List<TestSelectBean> dataList = new ArrayList<>();
-        TestSelectBean testSelectBean;
-        for (int i = 0; i < 6; i++) {
-            testSelectBean = new TestSelectBean();
-            testSelectBean.setSelected(i == 0);
-            testSelectBean.setText("position : " + i);
-            dataList.add(testSelectBean);
-        }
-
-        ListDialog<MyAdapter, TestSelectBean> listDialog = new ListDialog<>(this);
-        listDialog.setSelectAdapter(new MyAdapter(this, dataList, R.layout.item), new SelectAdapter.OnItemSelectedListener<TestSelectBean>() {
-            @Override
-            public void onItemSelected(BaseViewHolder viewHolder, int position, boolean isSelected, TestSelectBean testSelectBean) {
-                if (isSelected) ShowUtils.showToast(testSelectBean.getText());
-            }
-
-            @Override
-            public void onNothingSelected() {
-                ShowUtils.showToast("onNothingSelected");
-            }
-        }).setSelectMode(ISelect.MULTIPLE_MODE).showDialog();*/
-
-        new BottomDialog(this)
-                .setFullWidth()
-                .setFromBottom()
-                .setLeftButtonText("拍照")
-                .setRightButtonText("从相册中选择照片")
-                .setOnLeftBtnClickListener((dialog, view) -> {})
-                .setOnRightBtnClickListener((dialog, view) -> {})
-                .showDialog();
+        mPresenter.login("18805864649", "123456", 0, "");
     }
-
-    private List<TestSelectBean> mSelectDataList = new ArrayList<>();
 
     @Override
     public void showLoginMsg(User user) {
-        ((NoPaddingTextView) findViewById(R.id.tv)).setText(new Gson().toJson(user));
+        TestSelectBean testSelectBean = new TestSelectBean();
+        testSelectBean.setText(new Gson().toJson(user));
+        mAdapter.set(2, testSelectBean);
+        L.e("json : " + new Gson().toJson(user));
     }
 
     @Override
     public void showTip(String tip) {
-        ((NoPaddingTextView) findViewById(R.id.tv)).setText(tip);
+        TestSelectBean testSelectBean = new TestSelectBean();
+        testSelectBean.setText(new Gson().toJson(tip));
+        mAdapter.set(2, testSelectBean);
+        L.e("tip : " + tip);
     }
 
     class MyAdapter extends SelectAdapter<TestSelectBean> {

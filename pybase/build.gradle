@@ -108,10 +108,13 @@ dependencies {
         exclude module: 'rxjava'
         exclude module: 'rxandroid'
     }
-    compile(rootProject.ext.dependencies["rxcache2"]) {
+    /*compile(rootProject.ext.dependencies["rxcache2"]) {
         exclude module: 'rxjava'
         exclude module: 'dagger'
     }
+    compile (rootProject.ext.dependencies["rxcache-jolyglot-gson"]){
+        exclude module: 'gson'
+    }*/
 
     // tools
     compile rootProject.ext.dependencies["dagger2"]

@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.neuroandroid.pybase.utils.L;
 import com.neuroandroid.pybase.utils.NetworkUtils;
+import com.neuroandroid.pybase.utils.UIUtils;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,7 @@ public class RetrofitUtils {
         sRetrofit = new Retrofit.Builder().baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(getClient())
+                .client(getCacheClient(UIUtils.getContext()))
                 .build();
         return sRetrofit;
     }
@@ -57,7 +58,7 @@ public class RetrofitUtils {
         return builder.build();
     }
 
-    private static OkHttpClient getCacheClient(Context ctx, boolean needLog) {
+    private static OkHttpClient getCacheClient(Context ctx) {
         File httpCacheDirectory = new File(ctx.getCacheDir(), ctx.getPackageName());
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         Cache cache = new Cache(httpCacheDirectory, cacheSize);
@@ -65,14 +66,13 @@ public class RetrofitUtils {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.cache(cache)
                 // 连接失败是否重新请求
-                .retryOnConnectionFailure(true)
+                .retryOnConnectionFailure(true).connectTimeout(TIMEOUT_CONNECT, TimeUnit.SECONDS)
+                .readTimeout(TIMEOUT_CONNECT, TimeUnit.SECONDS)
                 // 没网络时的拦截器
                 .addInterceptor(getInterceptor(ctx))
                 // 有网络时的拦截器
-                .addNetworkInterceptor(getNetWorkInterceptor(ctx))
-                .networkInterceptors()
-                /*.add(new StethoInterceptor())*/;
-        if (needLog)
+                .addNetworkInterceptor(getNetWorkInterceptor(ctx));
+        if (L.getGlobalToggle())
             builder.addInterceptor(new LogInterceptor());
         return builder.build();
     }
@@ -109,6 +109,11 @@ public class RetrofitUtils {
                         .build();
             }
             return response;
+            /*return response.newBuilder()
+                    .removeHeader("Pragma")
+                    .removeHeader("Cache-Control")
+                    .header("Cache-Control", "public, max-age=" + 5)
+                    .build();*/
         };
     }
 }
