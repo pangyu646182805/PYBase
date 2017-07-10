@@ -1,6 +1,5 @@
 package com.neuroandroid.pybase.base;
 
-
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -20,19 +19,19 @@ import retrofit2.HttpException;
  * Created by NeuroAndroid on 2017/6/12.
  */
 
-public abstract class BaseObserver<T> implements Observer<BaseResponse<T>> {
+public abstract class BaseObserver<T> implements Observer<BaseResponse> {
     @Override
     public void onSubscribe(Disposable d) {
 
     }
 
     @Override
-    public void onNext(@NonNull BaseResponse<T> response) {
+    public void onNext(@NonNull BaseResponse response) {
         if (response.getCode() == Constant.RESPONSE_CODE_OK) {
-            T data = response.getData();
+            T data = (T) response;
             onHandleSuccess(data);
         } else {
-            onHandleError(response.getMsg());
+            onHandleError("onNext()->error");
         }
     }
 

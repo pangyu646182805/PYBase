@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.neuroandroid.pybase.R;
+import com.neuroandroid.pybase.utils.SystemUtils;
 import com.neuroandroid.pybase.widget.StateLayout;
 import com.trello.rxlifecycle2.components.support.RxFragment;
 
@@ -35,6 +39,10 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
     @BindView(R.id.tool_bar)
     Toolbar mToolbar;
 
+    @Nullable
+    @BindView(R.id.status_bar)
+    View mStatusBar;
+
     protected P mPresenter;
     private Unbinder mUnBinder;
 
@@ -52,6 +60,7 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getContext();
+        if (useEventBus()) EventBus.getDefault().register(this);
     }
 
     @Nullable
@@ -63,7 +72,10 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
             initPresenter();
             if (mToolbar != null) {
                 getBaseActivity().setSupportActionBar(mToolbar);
-                if (useOptionsMenu()) setHasOptionsMenu(true);
+                setHasOptionsMenu(true);
+                if (supportImmersive() && mStatusBar != null) {
+                    setStatusBar(mStatusBar);
+                }
             }
             initView();
         }
@@ -77,7 +89,6 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (useEventBus()) EventBus.getDefault().register(this);
         initData();
         initListener();
     }
@@ -89,22 +100,50 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
 
     @Override
     public void showLoading() {
-
+        if (mStateLayout != null) {
+            mStateLayout.setStatus(StateLayout.STATE_LOADING);
+        }
     }
 
     @Override
     public void hideLoading() {
-
+        if (mStateLayout != null) {
+            mStateLayout.hide();
+        }
     }
 
     @Override
     public void showError(StateLayout.OnRetryListener onRetryListener) {
-
+        if (mStateLayout != null) {
+            mStateLayout.setStatus(StateLayout.STATE_ERROR);
+            mStateLayout.setOnRetryListener(onRetryListener);
+        }
     }
 
     @Override
     public void showTip(String tip) {
 
+    }
+
+    protected Toolbar getToolbar() {
+        return mToolbar;
+    }
+
+    /**
+     * 设置返回按钮
+     */
+    protected void setDisplayHomeAsUpEnabled() {
+        if (mToolbar != null) {
+            getBaseActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    protected void setToolbarTitle(CharSequence title) {
+        if (mToolbar != null) getBaseActivity().getSupportActionBar().setTitle(title);
+    }
+
+    protected void setToolbarTitle(@StringRes int resId) {
+        if (mToolbar != null) getBaseActivity().getSupportActionBar().setTitle(resId);
     }
 
     protected BaseActivity getBaseActivity() {
@@ -115,20 +154,52 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
     }
 
     /**
+     * 获取activity
+     */
+    public <T> T getActivity(Class<T> clazz) {
+        return (T) mActivity;
+    }
+
+    /**
+     * 设置状态栏的颜色
+     *
+     * @param statusBar 状态栏的颜色
+     */
+    protected void setStatusBar(View statusBar) {
+        if (getBaseActivity() != null) {
+            if (getBaseActivity().mImmersive) {
+                statusBar.getLayoutParams().height = SystemUtils.getStatusHeight(mActivity);
+            }
+        }
+    }
+
+    /**
+     * 是否支持沉浸式状态栏
+     * 默认支持
+     */
+    protected boolean supportImmersive() {
+        return true;
+    }
+
+    /**
      * 绑定布局文件
      */
     protected abstract int attachLayoutRes();
 
-    protected void initPresenter() {}
+    protected void initPresenter() {
+    }
 
     /**
      * 初始化视图控件
      */
-    protected void initView() {}
+    protected void initView() {
+    }
 
-    protected void initData() {}
+    protected void initData() {
+    }
 
-    protected void initListener() {}
+    protected void initListener() {
+    }
 
     /**
      * 是否使用EventBus(默认不适用)
@@ -139,11 +210,32 @@ public abstract class BaseFragment<P extends IPresenter> extends RxFragment impl
     }
 
     /**
-     * Fragment是否使用ToolBar菜单
      * setHasOptionsMenu(true) 表示加载ToolBar菜单
-     * 默认为false， 如需求子类实现此方法并且返回true
+     * 但是Fragment的ToolBar菜单是Activity传递过来的
+     * Fragment需要实现自己的ToolBar菜单则需要menu.clear()
      */
-    protected boolean useOptionsMenu() {
-        return false;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (mUnBinder != Unbinder.EMPTY) mUnBinder.unbind();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // 释放资源
+        if (useEventBus()) EventBus.getDefault().unregister(this);
+        if (mPresenter != null) mPresenter.onDestroy();
+        this.mPresenter = null;
+        this.mUnBinder = null;
+        this.mActivity = null;
+        this.mContext = null;
+        this.mRootView = null;
     }
 }

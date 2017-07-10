@@ -43,6 +43,10 @@ public abstract class SelectAdapter<T extends ISelect> extends BaseRvAdapter<T> 
         mPrePos = prePos;
     }
 
+    public int getCheckedPos() {
+        return mPrePos;
+    }
+
     @Override
     public void addHeaderView(View... headerViews) {
         super.addHeaderView(headerViews);
@@ -66,7 +70,21 @@ public abstract class SelectAdapter<T extends ISelect> extends BaseRvAdapter<T> 
      */
     public void clearSelected() {
         for (ISelect bean : getDataList()) {
-            bean.setSelected(false);
+            if (bean.isSelected())
+                bean.setSelected(false);
+        }
+        selectedBeans.clear();
+    }
+
+    /**
+     * 全选
+     */
+    public void selectAll() {
+        selectedBeans.clear();
+        for (ISelect bean : getDataList()) {
+            selectedBeans.add((T) bean);
+            if (!bean.isSelected())
+                bean.setSelected(true);
         }
     }
 

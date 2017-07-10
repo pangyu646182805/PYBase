@@ -1,7 +1,9 @@
 package com.neuroandroid.pybase.adapter.base;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
@@ -18,7 +20,7 @@ import java.util.List;
  */
 
 public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHolder> implements CURD<T> {
-    private Context mContext;
+    protected Context mContext;
     // 数据源
     private List<T> mDataList;
     private int mLayoutId;
@@ -37,6 +39,11 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
     // EmptyView的位置
     protected int mEmptyViewPosition = -1;
     protected IMultiItemViewType<T> mMultiItemViewType;
+    protected RecyclerView.LayoutManager mLayoutManager;
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        mLayoutManager = layoutManager;
+    }
 
     public BaseRvAdapter(Context context, List<T> dataList, int layoutId) {
         mContext = context;
@@ -49,6 +56,26 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         mContext = context;
         mDataList = dataList == null ? new ArrayList<>() : dataList;
         this.mMultiItemViewType = multiItemViewType == null ? provideMultiItemViewType() : multiItemViewType;
+    }
+
+    /**
+     * 获取activity
+     */
+    public <T> T getActivity(Class<T> clazz) {
+        if (mContext instanceof Activity) {
+            return (T) mContext;
+        }
+        return null;
+    }
+
+    public void clearRvAnim(RecyclerView rv) {
+        if (rv == null) return;
+        RecyclerView.ItemAnimator animator = rv.getItemAnimator();
+        if (animator instanceof DefaultItemAnimator) {
+            ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
+        }
+        rv.getItemAnimator().setChangeDuration(333);
+        rv.getItemAnimator().setMoveDuration(333);
     }
 
     /**
@@ -74,10 +101,13 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
 
     @Override
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        BaseViewHolder viewHolder;
         if (viewType >= BaseViewType.FOOTER && mFooterViews != null && mFooterViews.get(viewType) != null) {
-            return BaseViewHolder.createViewHolder(mContext, mFooterViews.get(viewType));
+            viewHolder = BaseViewHolder.createViewHolder(mContext, mFooterViews.get(viewType));
+            return viewHolder;
         } else if (viewType >= BaseViewType.HEADER && mHeaderViews != null && mHeaderViews.get(viewType) != null) {
-            return BaseViewHolder.createViewHolder(mContext, mHeaderViews.get(viewType));
+            viewHolder = BaseViewHolder.createViewHolder(mContext, mHeaderViews.get(viewType));
+            return viewHolder;
         } else {
             int layoutId;
             if (mMultiItemViewType != null) {
@@ -85,7 +115,7 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
             } else {
                 layoutId = mLayoutId;
             }
-            BaseViewHolder viewHolder = BaseViewHolder.createViewHolder(mContext, parent, layoutId);
+            viewHolder = BaseViewHolder.createViewHolder(mContext, parent, layoutId);
             setListener(viewHolder);
             return viewHolder;
         }
@@ -307,6 +337,7 @@ public abstract class BaseRvAdapter<T> extends RecyclerView.Adapter<BaseViewHold
         }
         mDataList.addAll(position - getHeaderCounts(), items);
         notifyItemRangeInserted(position - getHeaderCounts(), items.size());
+        notifyDataSetChanged();
     }
 
     @Override

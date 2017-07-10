@@ -89,6 +89,7 @@ dependencies {
         exclude module: 'rxjava'
     }
     compile rootProject.ext.dependencies["okhttp3"]
+    compile rootProject.ext.dependencies["converter-scalars"]
     compile rootProject.ext.dependencies["glide"]
 
     compile rootProject.ext.dependencies["photoview"]

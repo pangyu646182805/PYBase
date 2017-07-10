@@ -16,7 +16,6 @@ import com.neuroandroid.pybase.adapter.base.ISelect;
 import com.neuroandroid.pybase.adapter.base.SelectAdapter;
 import com.neuroandroid.pybase.base.BaseActivity;
 import com.neuroandroid.pybase.bean.TestSelectBean;
-import com.neuroandroid.pybase.config.Constant;
 import com.neuroandroid.pybase.model.response.User;
 import com.neuroandroid.pybase.mvp.contract.ILoginContract;
 import com.neuroandroid.pybase.mvp.presenter.LoginPresenter;
@@ -39,7 +38,7 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
 
     @Override
     protected void initPresenter() {
-        mPresenter = new LoginPresenter(Constant.BASE_URL, this);
+        mPresenter = new LoginPresenter(this);
     }
 
     @Override

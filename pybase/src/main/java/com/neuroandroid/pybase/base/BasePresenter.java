@@ -1,5 +1,7 @@
 package com.neuroandroid.pybase.base;
 
+import com.neuroandroid.pybase.net.ModelFilteredFactory;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
@@ -13,8 +15,12 @@ public class BasePresenter<M extends IModel, V extends IView> implements IPresen
     protected M mModel;
     protected V mView;
 
-    public BasePresenter(String baseUrl, V view) {
+    public BasePresenter(V view) {
         this.mView = view;
+    }
+
+    protected <clazz> ModelFilteredFactory<BaseResponse<clazz>> getModelFilteredFactory(Class<clazz> clazz) {
+        return new ModelFilteredFactory<>();
     }
 
     protected void addDispose(Disposable disposable) {

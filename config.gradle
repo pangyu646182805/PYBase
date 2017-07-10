@@ -27,6 +27,7 @@ ext {
 
             // network
             "retrofit"                : "com.squareup.retrofit2:retrofit:${version["retrofitSdkVersion"]}",
+            "converter-scalars"       : "com.squareup.retrofit2:converter-scalars:2.1.0",
             "retrofit-converter-gson" : "com.squareup.retrofit2:converter-gson:${version["retrofitSdkVersion"]}",
             "retrofit-adapter-rxjava2": "com.squareup.retrofit2:adapter-rxjava2:${version["retrofitSdkVersion"]}",
             "okhttp3"                 : "com.squareup.okhttp3:okhttp:3.8.0",
@@ -50,7 +51,9 @@ ext {
             "rxjava2"                 : "io.reactivex.rxjava2:rxjava:2.1.0",
             "rxlifecycle2"            : "com.trello.rxlifecycle2:rxlifecycle:${version["rxlifecycle2SdkVersion"]}",
             "rxlifecycle2-components" : "com.trello.rxlifecycle2:rxlifecycle-components:${version["rxlifecycle2SdkVersion"]}",
-            "rxcache2"                : "com.github.VictorAlbertos.RxCache:runtime:1.8.0-2.x",
+            // "rxcache2"                : "com.github.VictorAlbertos.RxCache:runtime:1.8.0-2.x",
+            // "rxcache-jolyglot-gson"   : "com.github.VictorAlbertos.Jolyglot:gson:0.0.3",
+            "rxeasyhttp"              : "com.zhouyou:rxeasyhttp:1.0.6",
 
             // tools
             "dagger2"                 : "com.google.dagger:dagger:${version["dagger2SdkVersion"]}",
