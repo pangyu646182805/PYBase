@@ -8,8 +8,6 @@ import android.view.View;
 import android.widget.CheckBox;
 
 import com.google.gson.Gson;
-import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
-import com.lcodecore.tkrefreshlayout.header.progresslayout.ProgressLayout;
 import com.neuroandroid.pybase.R;
 import com.neuroandroid.pybase.adapter.base.BaseViewHolder;
 import com.neuroandroid.pybase.adapter.base.ISelect;
@@ -21,6 +19,11 @@ import com.neuroandroid.pybase.mvp.contract.ILoginContract;
 import com.neuroandroid.pybase.mvp.presenter.LoginPresenter;
 import com.neuroandroid.pybase.utils.L;
 import com.neuroandroid.pybase.widget.NoPaddingTextView;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.footer.ClassicsFooter;
+import com.scwang.smartrefresh.layout.header.ClassicsHeader;
+import com.scwang.smartrefresh.layout.listener.OnRefreshLoadmoreListener;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.ArrayList;
@@ -31,9 +34,10 @@ import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity<ILoginContract.Presenter> implements ILoginContract.View {
     @BindView(R.id.refresh_layout)
-    TwinklingRefreshLayout mRefreshLayout;
+    SmartRefreshLayout mRefreshLayout;
     @BindView(R.id.rv)
     RecyclerView mRv;
+
     private MyAdapter mAdapter;
 
     @Override
@@ -50,7 +54,8 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
     protected void initView() {
         mRv.setLayoutManager(new LinearLayoutManager(this));
         mRv.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
-        mRefreshLayout.setHeaderView(new ProgressLayout(this));
+        mRefreshLayout.setRefreshHeader(new ClassicsHeader(this));
+        mRefreshLayout.setRefreshFooter(new ClassicsFooter(this));
     }
 
     @Override
@@ -99,6 +104,21 @@ public class MainActivity extends BaseActivity<ILoginContract.Presenter> impleme
             @Override
             public void onNothingSelected() {
 
+            }
+        });
+    }
+
+    @Override
+    protected void initListener() {
+        mRefreshLayout.setOnRefreshLoadmoreListener(new OnRefreshLoadmoreListener() {
+            @Override
+            public void onLoadmore(RefreshLayout refreshlayout) {
+                refreshlayout.finishLoadmore(2000);
+            }
+
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshlayout.finishRefresh(2000);
             }
         });
     }

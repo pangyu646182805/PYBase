@@ -1,13 +1,17 @@
 package com.neuroandroid.pybase.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Handler;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.TypedValue;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -119,5 +123,46 @@ public class UIUtils {
             resources = context.getResources();
         }
         return TypedValue.applyDimension(unit, size, resources.getDisplayMetrics());
+    }
+
+    /**
+     * @param enable true : 全屏
+     */
+    public static void fullScreen(Activity activity, boolean enable) {
+        Window window = activity.getWindow();
+        if (enable) {
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            window.setAttributes(lp);
+            // getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        } else {
+            WindowManager.LayoutParams attr = window.getAttributes();
+            attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            window.setAttributes(attr);
+        }
+    }
+
+    /**
+     * 设置当前界面的屏幕亮度
+     *
+     * @param brightness 0-255
+     */
+    public static void setScreenBrightness(Activity activity, int brightness) {
+        WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+        lp.screenBrightness = Float.valueOf(brightness) * (1f / 255f);
+        activity.getWindow().setAttributes(lp);
+    }
+
+    /**
+     * 获得当前屏幕亮度值 0--255
+     */
+    public static int getScreenBrightness(Context context) {
+        int screenBrightness = 255;
+        try {
+            screenBrightness = Settings.System.getInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+        } catch (Exception localException) {
+
+        }
+        return screenBrightness;
     }
 }

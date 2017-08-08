@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+        <!--<com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
             android:id="@+id/refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -22,7 +22,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:overScrollMode="never"/>
-        </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
+        </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>-->
+
+        <com.scwang.smartrefresh.layout.SmartRefreshLayout
+            android:id="@+id/refresh_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:overScrollMode="never"/>
+        </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 
         <Button
             android:id="@+id/btn"
